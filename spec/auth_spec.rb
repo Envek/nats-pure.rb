@@ -40,7 +40,7 @@ describe 'Client - Authorization' do
     @server_control.start_server
     nats = NATS::IO::Client.new
     expect do
-      nats.connect(:servers => [TEST_AUTH_SERVER], :reconnect => false)
+      nats.connect!(:servers => [TEST_AUTH_SERVER], :reconnect => false)
       nats.flush
     end.to_not raise_error
     nats.close
@@ -51,31 +51,31 @@ describe 'Client - Authorization' do
     @server_control.start_server
     nats = NATS::IO::Client.new
     expect do
-      nats.connect(:servers => [TEST_TOKEN_AUTH_SERVER], :reconnect => false)
+      nats.connect!(:servers => [TEST_TOKEN_AUTH_SERVER], :reconnect => false)
       nats.flush
     end.to_not raise_error
     nats.close
 
     expect do
-      nc = NATS.connect(TEST_TOKEN_AUTH_SERVER, reconnect: false)
+      nc = NATS.connect!(TEST_TOKEN_AUTH_SERVER, reconnect: false)
       nc.flush
       nc.close
     end.to_not raise_error
 
     expect do
-      nc = NATS.connect(TEST_AUTH_SERVER_NO_CRED, reconnect: false)
+      nc = NATS.connect!(TEST_AUTH_SERVER_NO_CRED, reconnect: false)
       nc.flush
       nc.close
     end.to raise_error(NATS::IO::AuthError)
 
     expect do
-      nc = NATS.connect(TEST_AUTH_SERVER_NO_CRED, reconnect: false, auth_token: 'secret')
+      nc = NATS.connect!(TEST_AUTH_SERVER_NO_CRED, reconnect: false, auth_token: 'secret')
       nc.flush
       nc.close
     end.to_not raise_error
 
     expect do
-      nc = NATS.connect(TEST_WRONG_TOKEN_AUTH_SERVER, reconnect: false, auth_token: 'secret')
+      nc = NATS.connect!(TEST_WRONG_TOKEN_AUTH_SERVER, reconnect: false, auth_token: 'secret')
       nc.flush
       nc.close
     end.to_not raise_error
@@ -94,7 +94,7 @@ describe 'Client - Authorization' do
       nats.on_error do |e|
         errors << e
       end
-      nats.connect({
+      nats.connect!({
         servers: [TEST_AUTH_SERVER_NO_CRED],
         reconnect: false
       })

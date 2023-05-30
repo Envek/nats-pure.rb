@@ -33,7 +33,7 @@ describe 'Client - v2.2 features' do
     done2 = mon.new_cond
 
     nc = NATS::IO::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
 
     msgs = []
 
@@ -117,7 +117,7 @@ describe 'Client - v2.2 features' do
 
   it 'should make requests with headers' do
     nc = NATS::IO::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
     nc.on_error do |e|
       puts "Error: #{e}"
       puts e.backtrace
@@ -174,7 +174,7 @@ describe 'Client - v2.2 features' do
   end
 
   it 'should raise no responders error by default' do
-    nc = NATS.connect(servers: [@s.uri])
+    nc = NATS.connect!(servers: [@s.uri])
 
     expect do
       resp = nc.request("hi", "timeout", timeout: 1)
@@ -207,7 +207,7 @@ describe 'Client - v2.2 features' do
 
   it 'should not raise no responders error if no responders disabled' do
     nc = NATS::IO::Client.new
-    nc.connect(servers: [@s.uri], no_responders: false)
+    nc.connect!(servers: [@s.uri], no_responders: false)
 
     resp = nil
     expect do
@@ -242,7 +242,7 @@ describe 'Client - v2.2 features' do
 
   it 'should not raise no responders error if no responders disabled' do
     nc = NATS::IO::Client.new
-    nc.connect(servers: [@s.uri], no_responders: false)
+    nc.connect!(servers: [@s.uri], no_responders: false)
 
     resp = nil
     expect do
@@ -264,7 +264,7 @@ describe 'Client - v2.2 features' do
 
   it 'should handle responses with status and description headers' do
     nc = NATS::IO::Client.new
-    nc.connect(servers: [@s.uri], no_responders: true)
+    nc.connect!(servers: [@s.uri], no_responders: true)
 
     # Create sample Stream and pull based consumer from JetStream
     # from which it will be attempted to fetch messages using no_wait.
@@ -313,7 +313,7 @@ describe 'Client - v2.2 features' do
 
   it 'should get a message with Subscription#next_msg' do
     nc = NATS::IO::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
 
     sub = nc.subscribe("hello")
     msgs = []
@@ -349,7 +349,7 @@ describe 'Client - v2.2 features' do
 
   it 'should support NATS::Msg#respond' do
     nc = NATS::IO::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
     nc.on_error do |e|
       puts "Error: #{e}"
       puts e.backtrace
@@ -383,7 +383,7 @@ describe 'Client - v2.2 features' do
 
   it 'should make responses with headers NATS::Msg#respond_msg' do
     nc = NATS::IO::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
     nc.on_error do |e|
       puts "Error: #{e}"
       puts e.backtrace

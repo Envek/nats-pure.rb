@@ -30,36 +30,36 @@ describe 'Client - Specification' do
   it 'should connect' do
     expect do
       nc = NATS::Client.new
-      nc.connect(servers: [@s.uri])
+      nc.connect!(servers: [@s.uri])
       nc.close
     end.to_not raise_error
 
     # Using module method
     expect do
-      nc = NATS.connect(servers: [@s.uri])
+      nc = NATS.connect!(servers: [@s.uri])
       nc.close
     end.to_not raise_error
 
     # Single URI
     expect do
-      nc = NATS.connect("nats://127.0.0.1:4522")
+      nc = NATS.connect!("nats://127.0.0.1:4522")
       nc.close
     end.to_not raise_error
 
     expect do
-      nc = NATS.connect(@s.uri)
-      nc.close
-    end.to_not raise_error
-
-    expect do
-      nc = NATS::IO::Client.new
-      nc.connect("nats://127.0.0.1:4522")
+      nc = NATS.connect!(@s.uri)
       nc.close
     end.to_not raise_error
 
     expect do
       nc = NATS::IO::Client.new
-      nc.connect("127.0.0.1:4522")
+      nc.connect!("nats://127.0.0.1:4522")
+      nc.close
+    end.to_not raise_error
+
+    expect do
+      nc = NATS::IO::Client.new
+      nc.connect!("127.0.0.1:4522")
       nc.close
     end.to_not raise_error
   end
@@ -69,7 +69,7 @@ describe 'Client - Specification' do
     s.start_server(true)
 
     nc = NATS::Client.new
-    nc.connect(servers: [@s.uri])
+    nc.connect!(servers: [@s.uri])
 
     expect(nc.server_pool.length).to be > 1
 
@@ -82,7 +82,7 @@ describe 'Client - Specification' do
     s.start_server(true)
 
     nc = NATS::Client.new
-    nc.connect(servers: [@s.uri], ignore_discovered_urls: true)
+    nc.connect!(servers: [@s.uri], ignore_discovered_urls: true)
 
     expect(nc.server_pool.length).to eq(1)
 
@@ -94,31 +94,31 @@ describe 'Client - Specification' do
     ["x.>", "x.*",".x.", ".x", "x."].each do |p|
       expect do
         nc = NATS::Client.new
-        nc.connect(:servers => [@s.uri], :custom_inbox_prefix => p)
+        nc.connect!(:servers => [@s.uri], :custom_inbox_prefix => p)
       end.to raise_error(NATS::IO::ClientError)
     end
 
     ["x.y", "x", "_X", "_X_"].each do |p|
       expect do
         nc = NATS::Client.new
-        nc.connect(:servers => [@s.uri], :custom_inbox_prefix => p)
+        nc.connect!(:servers => [@s.uri], :custom_inbox_prefix => p)
       end.to_not raise_error
     end
 
     nc = NATS::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
     expect(nc.new_inbox).to start_with("_INBOX")
     expect(nc.new_inbox.length).to eq(29)
 
     nc = NATS::Client.new
-    nc.connect(:servers => [@s.uri], :custom_inbox_prefix => "custom_prefix")
+    nc.connect!(:servers => [@s.uri], :custom_inbox_prefix => "custom_prefix")
     expect(nc.new_inbox).to start_with("custom_prefix")
     expect(nc.new_inbox.length).to eq(36)
   end
 
   it 'should received a message when subscribed to a topic' do
     nc = NATS::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
 
     msgs = []
     nc.subscribe("hello") do |msg|
@@ -139,7 +139,7 @@ describe 'Client - Specification' do
   end
 
   it 'should be able to receive requests synchronously with a timeout' do
-    nc = NATS.connect(@s.uri)
+    nc = NATS.connect!(@s.uri)
 
     received = []
     nc.subscribe("help") do |msg, reply, subject|
@@ -163,7 +163,7 @@ describe 'Client - Specification' do
     done = mon.new_cond
 
     nc = NATS::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
 
     received = []
     nc.subscribe("help") do |msg, reply, subject|
@@ -199,7 +199,7 @@ describe 'Client - Specification' do
 
   it 'should be able to unsubscribe' do
     nc = NATS::IO::Client.new
-    nc.connect(:servers => [@s.uri], :reconnect => false)
+    nc.connect!(:servers => [@s.uri], :reconnect => false)
 
     msgs = []
     sub = nc.subscribe("foo") do |msg|
@@ -226,7 +226,7 @@ describe 'Client - Specification' do
   it 'should be able to create many subscriptions' do
     # NOTE: After v0.4.0 this means a lot of threads.
     nc = NATS::IO::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
     max_subs = 50
 
     msgs = { }
@@ -257,7 +257,7 @@ describe 'Client - Specification' do
 
   it 'should raise timeout error if timed request does not get response' do
     nc = NATS::IO::Client.new
-    nc.connect(:servers => [@s.uri])
+    nc.connect!(:servers => [@s.uri])
 
     # Have interest but do not respond
     nc.subscribe("hi") { }
@@ -274,7 +274,7 @@ describe 'Client - Specification' do
     test_is_done = mon.new_cond
 
     nats = NATS::IO::Client.new
-    nats.connect(:servers => [@s.uri], :reconnect => false)
+    nats.connect!(:servers => [@s.uri], :reconnect => false)
 
     errors = []
     disconnects = 0
@@ -333,7 +333,7 @@ describe 'Client - Specification' do
       conns[n][:nats] = nc
       conns[n][:msgs] = []
 
-      nc.connect({
+      nc.connect!({
         name: "nats-#{n}",
         servers: [@s.uri],
         reconnect: false
@@ -366,7 +366,7 @@ describe 'Client - Specification' do
   context 'using new style request response' do
     it 'should be able to receive requests synchronously with a timeout' do
       nc = NATS::IO::Client.new
-      nc.connect(:servers => [@s.uri], :old_style_request => false)
+      nc.connect!(:servers => [@s.uri], :old_style_request => false)
 
       received = []
       nc.subscribe("help") do |msg, reply, subject|
@@ -387,7 +387,7 @@ describe 'Client - Specification' do
 
     it 'should be able to receive requests synchronously in parallel' do
       nc = NATS::IO::Client.new
-      nc.connect(:servers => [@s.uri], :old_style_request => false)
+      nc.connect!(:servers => [@s.uri], :old_style_request => false)
 
       received = []
       nc.subscribe("help") do |payload, reply, subject|
@@ -456,7 +456,7 @@ describe 'Client - Specification' do
 
       another_thread = Thread.new do
         nats = NATS::IO::Client.new
-        nats.connect(:servers => [@s.uri], :reconnect => false)
+        nats.connect!(:servers => [@s.uri], :reconnect => false)
         nats.subscribe("help") do |msg|
           nats.publish(msg.reply, "response to req:#{msg.data}")
         end
@@ -473,7 +473,7 @@ describe 'Client - Specification' do
       end
 
       nc = NATS::IO::Client.new
-      nc.connect(:servers => [@s.uri])
+      nc.connect!(:servers => [@s.uri])
       mon.synchronize do
         subscribed_done.wait(1)
       end

@@ -127,7 +127,7 @@ describe 'Client - Cluster TLS reconnect' do
         ctx.verify_mode = OpenSSL::SSL::VERIFY_PEER
         ctx.verify_hostname = true
 
-        nats.connect("tls://server-A.clients.nats-service.localhost:4232", {
+        nats.connect!("tls://server-A.clients.nats-service.localhost:4232", {
                      dont_randomize_servers: true, reconnect: true, tls: {
                        context: ctx
                      }})

@@ -27,7 +27,7 @@ describe 'Client - Errors' do
 
   it 'should process errors from server' do
     nats = NATS::IO::Client.new
-    nats.connect(reconnect: false)
+    nats.connect!(reconnect: false)
 
     mon = Monitor.new
     done = mon.new_cond
@@ -71,7 +71,7 @@ describe 'Client - Errors' do
     done = mon.new_cond
 
     nats = NATS::IO::Client.new
-    nats.connect(reconnect: false)
+    nats.connect!(reconnect: false)
 
     errors = []
     nats.on_error do |e|
@@ -108,7 +108,7 @@ describe 'Client - Errors' do
 
   it 'should handle as async errors uncaught exceptions from callbacks' do
     nats = NATS::IO::Client.new
-    nats.connect(reconnect: false)
+    nats.connect!(reconnect: false)
 
     mon = Monitor.new
     done = mon.new_cond
@@ -167,7 +167,7 @@ describe 'Client - Errors' do
 
   it 'should handle subscriptions with slow consumers as async errors when over pending msgs limit' do
     nats = NATS::IO::Client.new
-    nats.connect(reconnect: false)
+    nats.connect!(reconnect: false)
 
     mon = Monitor.new
     done = mon.new_cond
@@ -225,7 +225,7 @@ describe 'Client - Errors' do
 
   it 'should handle subscriptions with slow consumers as async errors when over pending bytes limit' do
     nats = NATS::IO::Client.new
-    nats.connect(reconnect: false)
+    nats.connect!(reconnect: false)
 
     mon = Monitor.new
     done = mon.new_cond
@@ -323,7 +323,7 @@ describe 'Client - Errors' do
       end
 
       expect do
-      nats.connect({
+      nats.connect!({
         :servers => ["nats://127.0.0.1:4555"],
         :max_reconnect_attempts => 1,
         :reconnect_time_wait => 1,
@@ -387,7 +387,7 @@ describe 'Client - Errors' do
       end
 
       expect do
-      nc.connect({
+      nc.connect!({
         :servers => ["nats://127.0.0.1:4556"],
         :reconnect => false,
         :connect_timeout => 1
@@ -443,7 +443,7 @@ describe 'Client - Errors' do
       end
 
       expect do
-      nc.connect({
+      nc.connect!({
         :servers => ["nats://127.0.0.1:4556"],
         :reconnect => false,
         :connect_timeout => 1

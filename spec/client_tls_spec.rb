@@ -62,7 +62,7 @@ describe 'Client - TLS spec' do
       end
 
       expect do
-        nats.connect(:servers => ['nats://127.0.0.1:4444'], :reconnect => false)
+        nats.connect!(:servers => ['nats://127.0.0.1:4444'], :reconnect => false)
       end.to raise_error(NATS::IO::ConnectError)
 
       # Async handler also gets triggered since defined
@@ -94,7 +94,7 @@ describe 'Client - TLS spec' do
         tls_context = OpenSSL::SSL::SSLContext.new
         tls_context.set_params
         tls_context.ca_file = "./spec/configs/certs/ca.pem"
-        nats.connect({
+        nats.connect!({
           servers: ['tls://127.0.0.1:4444'],
           reconnect: false,
           tls: {
@@ -131,7 +131,7 @@ describe 'Client - TLS spec' do
       nats = NATS::IO::Client.new
 
       # Discard error since only want to confirm that TLS is setup due to scheme option.
-      nats.connect('tls://127.0.0.1:4444', reconnect:false) rescue nil
+      nats.connect!('tls://127.0.0.1:4444', reconnect:false) rescue nil
       expect(nats.options[:tls]).to_not be_nil
     end
     
@@ -154,7 +154,7 @@ describe 'Client - TLS spec' do
         tls_context = OpenSSL::SSL::SSLContext.new
         tls_context.ssl_version = :TLSv1
 
-        nats.connect({
+        nats.connect!({
                        servers: ['tls://127.0.0.1:4444'],
                        reconnect: false,
                        tls: {
@@ -220,7 +220,7 @@ describe 'Client - TLS spec' do
         tls_context.ca_file = "./spec/configs/certs/ca.pem"
         tls_context.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
-        nats.connect({
+        nats.connect!({
           servers: ['tls://127.0.0.1:4555'],
           reconnect: false,
           tls: {
@@ -285,7 +285,7 @@ describe 'Client - TLS spec' do
       expect do
         nats = NATS::IO::Client.new
 
-        nats.connect({
+        nats.connect!({
           servers: ["tls://server-A.clients.nats-service.localhost:#{@tls_verify_host_server_uri.port}"],
           reconnect: false,
           tls: {
@@ -306,7 +306,7 @@ describe 'Client - TLS spec' do
       expect do
         nats = NATS::IO::Client.new
 
-        nats.connect({
+        nats.connect!({
           servers: ["tls://server-A.clients.fake-nats-service.localhost:#{@tls_verify_host_server_uri.port}"],
           reconnect: false,
           tls: {
@@ -368,7 +368,7 @@ describe 'Client - TLS spec' do
       expect do
         nats = NATS::IO::Client.new
 
-        nats.connect({
+        nats.connect!({
           servers: ["tls://server-A.clients.nats-service.localhost:#{@tls_verify_host_bad_server_uri.port}"],
           reconnect: false,
           tls: {
@@ -394,7 +394,7 @@ describe 'Client - TLS spec' do
       expect do
         nats = NATS::IO::Client.new
 
-        nats.connect({
+        nats.connect!({
           servers: ["tls://server-A.clients.nats-service.localhost:#{@tls_verify_host_bad_server_uri.port}"],
           reconnect: false,
           tls: {
@@ -420,7 +420,7 @@ describe 'Client - TLS spec' do
       expect do
         nats = NATS::IO::Client.new
 
-        nats.connect("tls://server-A.clients.nats-service.localhost:#{@tls_verify_host_bad_server_uri.port}", {
+        nats.connect!("tls://server-A.clients.nats-service.localhost:#{@tls_verify_host_bad_server_uri.port}", {
           reconnect: false,
           tls: {
             context: ctx
