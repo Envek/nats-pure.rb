@@ -46,7 +46,7 @@ describe 'Client - NATS v2 Auth' do
       nats.on_error do |e|
         errors << e
       end
-      nats.connect(servers: ['nats://127.0.0.1:4722'],
+      nats.connect!(servers: ['nats://127.0.0.1:4722'],
                    reconnect: false,
                    user_credentials: "./spec/configs/nkeys/foo-user.creds")
       nats.subscribe("hello") do |msg|
@@ -86,7 +86,7 @@ describe 'Client - NATS v2 Auth' do
         nats.send(:jwt_cb_for_creds_file, "./spec/configs/nkeys/foo-user.creds").call()
       }
 
-      nats.connect(servers: ['nats://127.0.0.1:4722'],
+      nats.connect!(servers: ['nats://127.0.0.1:4722'],
                    reconnect: false,
                    user_signature_cb: sig_cb,
                    user_jwt_cb: jwt_cb)
@@ -120,7 +120,7 @@ describe 'Client - NATS v2 Auth' do
       end
 
       expect do
-        nats.connect(servers: ['nats://127.0.0.1:4722'],
+        nats.connect!(servers: ['nats://127.0.0.1:4722'],
                      reconnect: false)
       end.to raise_error(NATS::IO::AuthError)
 
@@ -179,7 +179,7 @@ describe 'Client - NATS v2 Auth' do
       nats.on_error do |e|
         errors << e
       end
-      nats.connect(servers: ['nats://127.0.0.1:4723'],
+      nats.connect!(servers: ['nats://127.0.0.1:4723'],
                    reconnect: false,
                    nkeys_seed: "./spec/configs/nkeys/foo-user.nk")
       nats.subscribe("hello") do |msg|
@@ -219,7 +219,7 @@ describe 'Client - NATS v2 Auth' do
         nats.send(:signature_cb_for_nkey_file, "./spec/configs/nkeys/foo-user.nk").call(nonce)
       }
 
-      nats.connect(servers: ['nats://127.0.0.1:4723'],
+      nats.connect!(servers: ['nats://127.0.0.1:4723'],
                    reconnect: false,
                    user_nkey_cb: user_nkey_cb,
                    user_signature_cb: sig_cb)

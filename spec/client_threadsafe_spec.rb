@@ -36,7 +36,7 @@ describe 'Client - Thread safety' do
     end
 
     def connect!
-      @nats.connect(@options)
+      @nats.connect!(@options)
     end
   end
 
@@ -103,7 +103,7 @@ describe 'Client - Thread safety' do
   end
 
   it 'should allow async subscriptions to process messages in parallel' do
-    nc = NATS.connect(servers: ['nats://0.0.0.0:4222'])
+    nc = NATS.connect!(servers: ['nats://0.0.0.0:4222'])
 
     foo_msgs = []
     nc.subscribe('foo') do |payload|
@@ -153,7 +153,7 @@ describe 'Client - Thread safety' do
   end
 
   it 'should connect once across threads' do
-    nc = NATS.connect(@s.uri)
+    nc = NATS.connect!(@s.uri)
     nc.subscribe(">") { }
     nc.subscribe("help") do |msg, reply|
       nc.publish(reply, "OK!")
@@ -179,7 +179,7 @@ describe 'Client - Thread safety' do
     5.times do
       ts << Thread.new do
         # connect should be idempotent across threads.
-        nc.connect(@s.uri)
+        nc.connect!(@s.uri)
         si = nc.instance_variable_get("@server_info")
         cids << si[:client_id]
         responses << nc.request("help", "hi")
@@ -204,7 +204,7 @@ describe 'Client - Thread safety' do
   major_version, minor_version, _ = Gem.loaded_specs['uri'].version.to_s.split('.').map(&:to_i)
   if major_version >= 0 && minor_version >= 11
     it 'should be able to process messages in a Ractor' do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
 
       messages = []
       nc.subscribe('foo') do |msg|
@@ -212,7 +212,7 @@ describe 'Client - Thread safety' do
       end
 
       r1 = Ractor.new(@s.uri) do |uri|
-        r_nc = NATS.connect(uri)
+        r_nc = NATS.connect!(uri)
 
         r_nc.publish('foo', 'bar')
         r_nc.flush
@@ -224,7 +224,7 @@ describe 'Client - Thread safety' do
       expect(messages.count).to eql(1)
 
       r2 = Ractor.new(@s.uri) do |uri|
-        r_nc = NATS.connect(uri)
+        r_nc = NATS.connect!(uri)
 
         r_messages = []
         r_nc.subscribe('bar') do |payload, reply|

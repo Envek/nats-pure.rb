@@ -15,7 +15,7 @@ describe 'KeyValue' do
   end
 
   it 'should support access to KeyValue stores' do
-    nc = NATS.connect(@s.uri)
+    nc = NATS.connect!(@s.uri)
 
     js = nc.jetstream
     kv = js.create_key_value(bucket: "TEST", history: 5, ttl: 3600)
@@ -62,7 +62,7 @@ describe 'KeyValue' do
   end
 
   it "should report when bucket is not found or invalid" do
-    nc = NATS.connect(@s.uri)
+    nc = NATS.connect!(@s.uri)
 
     js = nc.jetstream
     expect do
@@ -85,7 +85,7 @@ describe 'KeyValue' do
   end
 
   it 'should support access to KeyValue stores from multiple instances' do
-    nc = NATS.connect(@s.uri)
+    nc = NATS.connect!(@s.uri)
 
     js = nc.jetstream
     kv = js.create_key_value(bucket: "TEST2")
@@ -93,7 +93,7 @@ describe 'KeyValue' do
       kv.put(l, l*10)
     end
 
-    nc2 = NATS.connect(@s.uri)
+    nc2 = NATS.connect!(@s.uri)
     js2 = nc2.jetstream
     kv2 = js2.key_value("TEST2")
     a = kv2.get("a")
@@ -104,7 +104,7 @@ describe 'KeyValue' do
   end
 
   it 'should support get by revision' do
-    nc = NATS.connect(@s.uri)
+    nc = NATS.connect!(@s.uri)
     js = nc.jetstream
     kv = js.create_key_value(bucket: "TEST", history: 5, ttl: 3600, description: "Basic KV")
 
@@ -285,7 +285,7 @@ describe 'KeyValue' do
   end
 
   it 'should support direct get' do
-    nc = NATS.connect(@s.uri)
+    nc = NATS.connect!(@s.uri)
     js = nc.jetstream
     kv = js.create_key_value(
            bucket: "TESTDIRECT",
@@ -349,7 +349,7 @@ describe 'KeyValue' do
   end
 
   it 'should support republish' do
-    nc = NATS.connect(@s.uri)
+    nc = NATS.connect!(@s.uri)
     js = nc.jetstream
     kv = js.create_key_value(
            bucket: "TESTRP",

@@ -34,7 +34,8 @@ end
 
 module NATS
   class << self
-    # NATS.connect creates a connection to the NATS Server.
+    # NATS.connect creates a client to the NATS Server.
+    # Connection will be established asynchronously on the first use.
     # @param uri [String] URL endpoint of the NATS Server or cluster.
     # @param opts [Hash] Options to customize the NATS connection.
     # @return [NATS::Client]
@@ -42,7 +43,7 @@ module NATS
     # @example
     #   require 'nats'
     #   nc = NATS.connect("demo.nats.io")
-    #   nc.publish("hello", "world")
+    #   nc.publish("hello", "world") # connection will be established now
     #   nc.close
     #
     def connect(uri=nil, opts={})
@@ -50,6 +51,23 @@ module NATS
       nc.connect(uri, opts)
 
       nc
+    end
+
+    # NATS.connect creates a connection to the NATS Server.
+    # @param uri [String] URL endpoint of the NATS Server or cluster.
+    # @param opts [Hash] Options to customize the NATS connection.
+    # @return [NATS::Client]
+    #
+    # @example
+    #   require 'nats'
+    #   nc = NATS.connect!("demo.nats.io") # connection will be established now
+    #   nc.publish("hello", "world")
+    #   nc.close
+    #
+    def connect!(uri=nil, opts={})
+      NATS::Client.new.tap do |client|
+        client.connect!(uri, opts)
+      end
     end
   end
 
@@ -127,8 +145,13 @@ module NATS
       def after_fork
         INSTANCES.each do |client|
           if client.options[:reconnect]
-            client.close
-            client.connect(client.uri, client.options)
+            was_connected = !client.disconnected?
+            client.send(:close_connection, Status::DISCONNECTED, true)
+            if was_connected # re-establish connection
+              client.connect!(client.uri, client.options)
+            else # Client was connected, re-establish connection
+              client.connect(client.uri, client.options)
+            end
           else
             client.send(:err_cb_call, self, NATS::IO::ForkDetectedError, nil)
             client.close
@@ -228,19 +251,19 @@ module NATS
       # Draining
       @drain_t = nil
 
+      @options = {}
+
       # Keep track of all client instances to handle them after process forking in Ruby 3.1+
       INSTANCES[self] = self
     end
 
-    # Establishes a connection to NATS.
+    # Prepare connecting to NATS, but postpone real connection until first usage.
     def connect(uri=nil, opts={})
       synchronize do
         # In case it has been connected already, then do not need to call this again.
         return if @connect_called
         @connect_called = true
       end
-
-      @ruby_pid = Process.pid # For fork detection
 
       # Reset these in case we have reconnected via fork.
       @resp_sub = nil
@@ -332,6 +355,18 @@ module NATS
 
       validate_settings!
 
+      self
+    end
+
+    # Establishes a connection to NATS immediately.
+    def connect!(uri = nil, opts = {})
+      connect(uri, opts)
+      establish_connection!
+    end
+
+    private def establish_connection!
+      @ruby_pid = Process.pid # For fork detection
+
       srv = nil
       begin
         srv = select_next_server
@@ -408,6 +443,12 @@ module NATS
       start_threads!
 
       self
+    end
+
+    def ensure_connected!
+      raise NATS::IO::ConnectionClosedError if closed?
+
+      establish_connection! unless connected? || connecting? || reconnecting?
     end
 
     def publish(subject, msg=EMPTY_MSG, opt_reply=nil, **options, &blk)
@@ -754,6 +795,10 @@ module NATS
       connected? ? @uri : nil
     end
 
+    def disconnected?
+      @status == DISCONNECTED
+    end
+
     def connected?
       @status == CONNECTED
     end
@@ -1066,7 +1111,7 @@ module NATS
     end
 
     def send_command(command)
-      raise NATS::IO::ConnectionClosedError if closed?
+      ensure_connected!
 
       @pending_size += command.bytesize
       @pending_queue << command

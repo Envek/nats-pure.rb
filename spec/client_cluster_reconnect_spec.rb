@@ -100,7 +100,7 @@ describe 'Client - Cluster reconnect' do
       mon = Monitor.new
       reconnected = mon.new_cond
 
-      nats = NATS.connect(:servers => [@s1.uri, @s2.uri], :dont_randomize_servers => true)
+      nats = NATS.connect!(:servers => [@s1.uri, @s2.uri], :dont_randomize_servers => true)
 
       disconnects = 0
       nats.on_disconnect do
@@ -152,7 +152,7 @@ describe 'Client - Cluster reconnect' do
       reconnected = mon.new_cond
 
       nats = NATS::IO::Client.new
-      nats.connect("nats://secret:password@127.0.0.1:4242,nats://secret:password@127.0.0.1:4243", :dont_randomize_servers => true)
+      nats.connect!("nats://secret:password@127.0.0.1:4242,nats://secret:password@127.0.0.1:4243", :dont_randomize_servers => true)
 
       disconnects = 0
       nats.on_disconnect do
@@ -204,7 +204,7 @@ describe 'Client - Cluster reconnect' do
       reconnected = mon.new_cond
 
       nats = NATS::IO::Client.new
-      nats.connect({
+      nats.connect!({
         servers: [@s1.uri, @s2.uri],
         dont_randomize_servers: true
       })
@@ -321,7 +321,7 @@ describe 'Client - Cluster reconnect' do
         end
 
         # Connect to first server only and trigger reconnect
-        nats.connect(:servers => [@s1.uri], :dont_randomize_servers => true, :reconnect => true)
+        nats.connect!(:servers => [@s1.uri], :dont_randomize_servers => true, :reconnect => true)
         expect(nats.connected_server).to eql(@s1.uri)
         @s1.kill_server
         sleep 0.2
@@ -386,7 +386,7 @@ describe 'Client - Cluster reconnect' do
         end
 
         # Connect to first server only and trigger reconnect
-        nats.connect("nats://secret:password@127.0.0.1:4242", :dont_randomize_servers => true, :reconnect => true, :reconnect_time_wait => 0.5)
+        nats.connect!("nats://secret:password@127.0.0.1:4242", :dont_randomize_servers => true, :reconnect => true, :reconnect_time_wait => 0.5)
         expect(nats.connected_server.to_s).to eql(@s1.uri.to_s)
         @s1.kill_server
         sleep 0.1
@@ -443,7 +443,7 @@ describe 'Client - Cluster reconnect' do
       end
 
       # Connect to first server only and trigger reconnect
-      nats.connect({
+      nats.connect!({
         :servers => [@s1.uri],
         :dont_randomize_servers => true,
         :user => 'secret',

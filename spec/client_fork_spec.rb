@@ -31,7 +31,7 @@ describe 'Client - Fork detection' do
   end
 
   let(:options) { {} }
-  let!(:nats) { NATS.connect("nats://127.0.0.1:4524", options) }
+  let!(:nats) { NATS.connect!("nats://127.0.0.1:4524", options) }
 
   it 'should be able to publish messages from child process after forking' do
     received = nil

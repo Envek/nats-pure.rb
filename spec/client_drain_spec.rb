@@ -14,8 +14,8 @@ describe 'Client - Drain' do
   end
 
   it 'should gracefully drain a connection' do
-    nc = NATS.connect
-    nc2 = NATS.connect(drain_timeout: 15)
+    nc = NATS.connect!
+    nc2 = NATS.connect!(drain_timeout: 15)
 
     errors = []
     nc.on_error do |e|
@@ -93,7 +93,7 @@ describe 'Client - Drain' do
   end
 
   it 'should report drain timeout error' do
-    nc = NATS.connect(drain_timeout: 0.1)
+    nc = NATS.connect!(drain_timeout: 0.1)
 
     future = Future.new
 

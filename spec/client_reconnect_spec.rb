@@ -15,7 +15,7 @@ describe 'Client - Reconnect' do
 
   it 'should process errors from a server and reconnect' do
     nats = NATS::IO::Client.new
-    nats.connect({
+    nats.connect!({
       reconnect: true,
       reconnect_time_wait: 2,
       max_reconnect_attempts: 1
@@ -155,7 +155,7 @@ describe 'Client - Reconnect' do
       mon.synchronize { done.signal }
     end
 
-    nats.connect(:reconnect => false)
+    nats.connect!(:reconnect => false)
 
     nats.subscribe("foo") do |msg|
       msgs << msg
@@ -211,7 +211,7 @@ describe 'Client - Reconnect' do
     end
 
     expect do
-      nats.connect({
+      nats.connect!({
        :servers => ["nats://127.0.0.1:4229"],
        :max_reconnect_attempts => 2,
        :reconnect_time_wait => 1
@@ -255,7 +255,7 @@ describe 'Client - Reconnect' do
       mon.synchronize { done.signal }
     end
 
-    nats.connect({
+    nats.connect!({
      :servers => ["nats://127.0.0.1:4222"],
      :max_reconnect_attempts => 1,
      :reconnect_time_wait => 1
@@ -338,7 +338,7 @@ describe 'Client - Reconnect' do
         mon.synchronize { done.signal }
       end
 
-      nats.connect({
+      nats.connect!({
         :servers => ["nats://127.0.0.1:4222", "nats://127.0.0.1:4444"],
         :max_reconnect_attempts => 1,
         :reconnect_time_wait => 1,
@@ -423,7 +423,7 @@ describe 'Client - Reconnect' do
         mon.synchronize { done.signal }
       end
 
-      nats.connect({
+      nats.connect!({
         :servers => ["nats://127.0.0.1:4445","nats://127.0.0.1:4222"],
         :max_reconnect_attempts => -1,
         :reconnect_time_wait => 2,
@@ -507,7 +507,7 @@ describe 'Client - Reconnect' do
         closes += 1
       end
 
-      nats.connect({
+      nats.connect!({
         :servers => ["nats://127.0.0.1:4446","nats://127.0.0.1:4222"],
         :max_reconnect_attempts => -1,
         :reconnect_time_wait => 2,
@@ -594,7 +594,7 @@ describe 'Client - Reconnect' do
         closes += 1
       end
 
-      nats.connect({
+      nats.connect!({
         :servers => ["nats://127.0.0.1:4447"],
         :max_reconnect_attempts => 1,
         :reconnect_time_wait => 2,

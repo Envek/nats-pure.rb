@@ -30,7 +30,7 @@ describe 'JetStream' do
     end
 
     it 'should publish messages to a stream' do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
 
       # Create sample Stream and pull based consumer from JetStream
       # from which it will be attempted to fetch messages using no_wait.
@@ -86,7 +86,7 @@ describe 'JetStream' do
     end
 
     before(:each) do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       stream_req = {
         name: "test",
         subjects: ["test"]
@@ -97,7 +97,7 @@ describe 'JetStream' do
     end
 
     after(:each) do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       stream_req = {
         name: "test",
         subjects: ["test"]
@@ -107,7 +107,7 @@ describe 'JetStream' do
       nc.close
     end
 
-    let(:nc) { NATS.connect(@s.uri) }
+    let(:nc) { NATS.connect!(@s.uri) }
 
     it "should auto create pull subscription" do
       js = nc.jetstream
@@ -144,7 +144,7 @@ describe 'JetStream' do
     end
 
     it 'should find the pull subscription by subject' do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       js = nc.jetstream
 
       consumer_req = {
@@ -166,7 +166,7 @@ describe 'JetStream' do
     end
 
     it 'should pull subscribe and fetch messages' do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       js = nc.jetstream
 
       consumer_req = {
@@ -433,7 +433,7 @@ describe 'JetStream' do
     end
 
     it 'should unsubscribe' do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       js = nc.jetstream
 
       consumer_req = {
@@ -475,8 +475,8 @@ describe 'JetStream' do
     end
 
     it 'should account pending data' do
-      nc = NATS.connect(@s.uri)
-      nc2 = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
+      nc2 = NATS.connect!(@s.uri)
       js = nc.jetstream
       subject = "limits.test"
 
@@ -517,7 +517,7 @@ describe 'JetStream' do
     end
 
     it 'should create and bind to consumer with name' do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       js = nc.jetstream
 
       js.add_stream(name: "ctests", subjects: ['a', 'b', 'c.>'])
@@ -648,7 +648,7 @@ describe 'JetStream' do
     end
 
     before(:each) do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       stream_req = {
         name: "test",
         subjects: ["test"]
@@ -659,7 +659,7 @@ describe 'JetStream' do
     end
 
     after(:each) do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       stream_req = {
         name: "test",
         subjects: ["test"]
@@ -669,7 +669,7 @@ describe 'JetStream' do
       nc.close
     end
 
-    let(:nc) { NATS.connect(@s.uri) }
+    let(:nc) { NATS.connect!(@s.uri) }
 
     it "should create ephemeral subscription with auto and manual ack" do
       js = nc.jetstream
@@ -857,7 +857,7 @@ describe 'JetStream' do
     end
 
     it 'should produce, consume and ack messages in a stream' do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
 
       # Create stream in the domain.
       subject = "foo"
@@ -947,7 +947,7 @@ describe 'JetStream' do
     end
 
     it 'should bail when stream or consumer does not exist in domain' do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
       js = nc.JetStream(domain: @domain)
 
       # Should try to auto lookup and fail.
@@ -1106,7 +1106,7 @@ describe 'JetStream' do
       FileUtils.remove_entry(@tmpdir)
     end
 
-    let(:nc) { NATS.connect(@s.uri) }
+    let(:nc) { NATS.connect!(@s.uri) }
 
     it "should support jsm.add_stream" do
       stream_config = {
@@ -1320,7 +1320,7 @@ describe 'JetStream' do
     end
 
     it "should support jsm.consumer_info" do
-      nc = NATS.connect(@s.uri)
+      nc = NATS.connect!(@s.uri)
 
       stream_req = {
         name: "quux",
